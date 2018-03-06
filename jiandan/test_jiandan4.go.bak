@@ -1,0 +1,28 @@
+package pholcus_lib
+
+import (
+	"github.com/nladuo/go-phantomjs-fetcher"
+	"log"
+)
+
+
+func main(){
+	fetcher, err := phantomjs.NewFetcher(2016,nil)
+	defer fetcher.ShutDownPhantomJSServer()
+	if err != nil {
+		panic(err)
+	}
+
+	js_script := `var scrollTop = $(window).scrollTop();
+$(window).scrollTop(scrollTop);`
+	//run the injected js_script at the end of loading html
+	js_run_at := phantomjs.RUN_AT_DOC_END
+	//send httpGet request with injected js
+	resp, err := fetcher.GetWithJS("http://jiandan.net/ooxx/", js_script, js_run_at)
+
+	if err != nil {
+		panic(err)
+	}
+
+	log.Print(resp.Content)
+}

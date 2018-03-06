@@ -1,0 +1,23 @@
+package pholcus_lib
+
+import (
+	"fmt"
+	"io/ioutil"
+	. "github.com/k4s/phantomgo"
+)
+
+func main() {
+	p := &Param{
+		Method: "GET", //POST or GET ..
+		Url:    "http://jiandan.net/ooxx",
+		//Header:       http.Header{"Cookie": []string{"your cookies"}},
+		UsePhantomJS: true,
+	}
+	brower := NewPhantom()
+	resp, err := brower.Download(p)
+	if err != nil {
+		fmt.Println(err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
+}

@@ -1,0 +1,119 @@
+package pholcus_lib
+
+import (
+	"github.com/PuerkitoBio/goquery"
+	"log"
+	"strconv"
+	//"github.com/robertkrimen/otto"
+	"regexp"
+	"net/http"
+	"io/ioutil"
+	"github.com/robertkrimen/otto"
+	. "github.com/k4s/phantomgo"
+	"fmt"
+)
+
+func ExampleScrape() {
+
+	url := "http://jandan.net/ooxx"
+
+	p := &Param{
+		Method: "GET", //POST or GET ..
+		Url:    url,
+		//Header:       http.Header{"Cookie": []string{"your cookies"}},
+		UsePhantomJS: true,
+	}
+	brower := NewPhantom()
+	resp, err := brower.Download(p)
+	if err != nil {
+		fmt.Println(err)
+	}
+	//body, err := ioutil.ReadAll(resp.Body)
+
+	doc,_ := goquery.NewDocumentFromReader(resp.Body)
+
+
+	//doc, err := goquery.NewDocument("http://jandan.net/ooxx")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	body, _ := doc.Html()
+
+	log.Println(body)
+	return 
+
+	// 获取加密 js 路径
+	r, _ := regexp.Compile(`.*<script\ssrc=\"\/\/(cdn.jandan.net\/static\/min.*?)\"><\/script>.*`)
+	jsF := r.FindStringSubmatch(body)
+	jsFileUrl := "http://" + jsF[1]
+	log.Println("js",jsFileUrl)
+	jsContextResp, _ := http.Get(jsFileUrl)
+	defer jsContextResp.Body.Close()
+	jsBody, _ := ioutil.ReadAll(jsContextResp.Body)
+	jsBodyStr := string(jsBody)
+
+	// 获取加密 js 定义
+	r2, _ := regexp.Compile(`(f_\w+.)=`)
+	jsF2 := r2.FindStringSubmatch(jsBodyStr)
+	jsFunc := jsF2[1]
+
+	// 获取加密动态 key
+	r3, _ := regexp.Compile(`c=f_\w+\(\w+,"(\w+)"\);`)
+	jsF3 := r3.FindStringSubmatch(jsBodyStr)
+	jsKey := jsF3[1]
+
+	// Find the review items
+	doc.Find(".commentlist li").Each(func(i int, s *goquery.Selection) {
+		//s.Find("img").Each(func(i int, img *goquery.Selection) {
+		//	log.Println(img.Attr("src"))
+		//})
+
+		like, _ := s.Find("a.comment-like + span").Html()
+		unlike, _ := s.Find("a.comment-unlike + span").Html()
+
+		if like != "" {
+			//log.Println(s.Find("a.comment-like").Html())
+			//log.Println(s.Find("a.comment-unlike").Html())
+
+			numLike, _ := strconv.Atoi(like)
+			numUnLike, _ := strconv.Atoi(unlike)
+
+			imgHash := s.Find(".img-hash").First().Text();
+
+			log.Println(jsBodyStr)
+
+			vm := otto.New()
+			vm.Set("iFunc", jsFunc)
+			vm.Set("ikEY", jsKey)
+			vm.Set("imgHash", imgHash)
+			vm.Set("result", "")
+			vm.Run(jsBodyStr + `;
+console.log(iFunc);
+console.log(imgHash);
+console.log(ikEY);
+//result= iFunc(imgHash, ikEY);
+//console.log(result);
+`)
+
+			return
+
+
+			log.Println(numLike)
+			log.Println(numUnLike)
+
+		}
+
+		//if href, ok := s.Attr("href"); ok {
+		//	ctx.AddQueue(&request.Request{
+		//		Url:    href,
+		//		Header: http.Header{"Content-Type": []string{"text/html; charset=utf-8"}},
+		//		Rule:   "搜索结果",
+		//	})
+		//}
+	})
+}
+
+func main() {
+	ExampleScrape()
+}

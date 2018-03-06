@@ -1,0 +1,72 @@
+package pholcus_lib
+
+import (
+	"github.com/PuerkitoBio/goquery"
+	"log"
+	"strconv"
+	//"github.com/robertkrimen/otto"
+	. "github.com/k4s/phantomgo"
+	"fmt"
+)
+
+func ExampleScrape() {
+
+	url := "http://jandan.net/ooxx"
+
+	p := &Param{
+		Method: "GET", //POST or GET ..
+		Url:    url,
+		//Header:       http.Header{"Cookie": []string{"your cookies"}},
+		UsePhantomJS: true,
+	}
+	brower := NewPhantom()
+	resp, err := brower.Download(p)
+	if err != nil {
+		fmt.Println(err)
+	}
+	//body, err := ioutil.ReadAll(resp.Body)
+
+	doc, _ := goquery.NewDocumentFromReader(resp.Body)
+
+	// Find the review items
+	doc.Find(".commentlist li").Each(func(i int, s *goquery.Selection) {
+
+		like, _ := s.Find("a.comment-like + span").Html()
+		unlike, _ := s.Find("a.comment-unlike + span").Html()
+
+		if like != "" {
+			//log.Println(s.Find("a.comment-like").Html())
+			//log.Println(s.Find("a.comment-unlike").Html())
+
+			numLike, _ := strconv.Atoi(like)
+			numUnLike, _ := strconv.Atoi(unlike)
+
+			if numUnLike == 0 {
+				numUnLike = 1
+			}
+
+			if numLike > numUnLike && numLike/numUnLike*100 >= 61 {
+				s.Find("a.view_img_link").Each(func(i int, img *goquery.Selection) {
+					href, _ := img.Attr("href")
+					log.Println("https:" + href)
+				})
+			}
+
+			//log.Println(numLike)
+			//log.Println(numUnLike)
+
+		}
+
+		//if href, ok := s.Attr("href"); ok {
+		//	ctx.AddQueue(&request.Request{
+		//		Url:    href,
+		//		Header: http.Header{"Content-Type": []string{"text/html; charset=utf-8"}},
+		//		Rule:   "搜索结果",
+		//	})
+		//}
+	})
+}
+
+func main() {
+	ExampleScrape()
+}

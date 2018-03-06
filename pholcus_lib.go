@@ -14,7 +14,6 @@ import (
 	_ "github.com/henrylee2cn/pholcus_lib/hollandandbarrett"
 	_ "github.com/henrylee2cn/pholcus_lib/jdsearch"
 	_ "github.com/henrylee2cn/pholcus_lib/jingdong"
-	_ "github.com/henrylee2cn/pholcus_lib/jiban"
 	_ "github.com/henrylee2cn/pholcus_lib/kaola"
 	_ "github.com/henrylee2cn/pholcus_lib/lewa"
 	_ "github.com/henrylee2cn/pholcus_lib/miyabaobei"
@@ -29,4 +28,5 @@ import (
 	_ "github.com/henrylee2cn/pholcus_lib/zolphone"
 	_ "github.com/henrylee2cn/pholcus_lib/zolslab"
 	_ "github.com/henrylee2cn/pholcus_lib/wukongwenda"
+	_ "pholcus_lib/jiandan"
 )
