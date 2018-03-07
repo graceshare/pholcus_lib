@@ -18,7 +18,7 @@ import (
 	_ "github.com/henrylee2cn/pholcus_lib/lewa"
 	_ "github.com/henrylee2cn/pholcus_lib/miyabaobei"
 	_ "github.com/henrylee2cn/pholcus_lib/people"
-	_ "github.com/henrylee2cn/pholcus_lib/qq_avatar"
+	_ "pholcus_lib/qq_avatar"
 	_ "github.com/henrylee2cn/pholcus_lib/shunfenghaitao"
 	_ "github.com/henrylee2cn/pholcus_lib/taobao"
 	_ "github.com/henrylee2cn/pholcus_lib/taobaosearch"
@@ -29,4 +29,5 @@ import (
 	_ "github.com/henrylee2cn/pholcus_lib/zolslab"
 	_ "github.com/henrylee2cn/pholcus_lib/wukongwenda"
 	_ "pholcus_lib/jiandan"
+	_ "pholcus_lib/jiandan2"
 )

@@ -33,13 +33,12 @@ var Jiandan = &Spider{
 				AidFunc: func(ctx *Context, aid map[string]interface{}) interface{} {
 					var url string
 					for loop := aid["loop"].([2]int); loop[0] < loop[1]; loop[0]++ {
-						if loop[0] == 0 {
-							url = "http://jandan.net/ooxx"
-							loop[0]++
-						} else {
-							url = fmt.Sprintf("http://jandan.net/ooxx/page-%s#comments", strconv.Itoa(loop[0]+1))
-						}
-
+						//if loop[0] == 0 {
+						//	url = "http://jandan.net/ooxx"
+						//	loop[0]++
+						//} else {
+						url = fmt.Sprintf("http://jandan.net/ooxx/page-%s#comments", strconv.Itoa(loop[0]+1))
+						//}
 						// get content
 
 						p := &Param{
@@ -76,14 +75,9 @@ var Jiandan = &Spider{
 										src := "https:" + href
 										ctx.AddQueue(&request.Request{
 											Url:          src,
-											Rule:         "下载文件",
+											Rule:         "download",
 											ConnTimeout:  -1,
 											DownloaderID: 0,
-										})
-
-										ctx.Output(map[int]interface{}{
-											0: src,
-											1: loop[0],
 										})
 									})
 								}
@@ -93,9 +87,17 @@ var Jiandan = &Spider{
 					return nil
 				},
 			},
-			"下载文件": {
+			"download": {
+				ItemFields: []string{
+					"img",
+				},
 				ParseFunc: func(ctx *Context) {
-					ctx.FileOutput()
+
+					ctx.Output(map[int]interface{}{
+						0: ctx.GetUrl(),
+					})
+
+					//ctx.FileOutput()
 				},
 			},
 		},

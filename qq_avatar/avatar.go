@@ -41,6 +41,9 @@ var Avatar = &Spider{
 
 		Trunk: map[string]*Rule{
 			"生成请求": {
+				ItemFields: []string{
+					"生成请求",
+				},
 				AidFunc: func(ctx *Context, aid map[string]interface{}) interface{} {
 					var url string
 					for loop := aid["loop"].([2]int); loop[0] < loop[1]; loop[0]++ {
@@ -54,6 +57,9 @@ var Avatar = &Spider{
 							Url:    url,
 							Rule:   aid["Rule"].(string),
 							Header: http.Header{"Content-Type": []string{"text/html; charset=utf-8"}},
+						})
+						ctx.Output(map[int]interface{}{
+							0: "生成请求",
 						})
 					}
 					return nil
@@ -76,6 +82,9 @@ var Avatar = &Spider{
 						})
 						return
 					}
+					ctx.Output(map[int]interface{}{
+						0: "生成请求2",
+					})
 					// 用指定规则解析响应流
 					ctx.Parse("搜索结果")
 				},
@@ -84,6 +93,7 @@ var Avatar = &Spider{
 				ItemFields: []string{
 					"avatar",
 					"nickname",
+					"test",
 				},
 				ParseFunc: func(ctx *Context) {
 					query := ctx.GetDom()
@@ -100,7 +110,8 @@ var Avatar = &Spider{
 						str := strings.Split(src, "/")
 						ctx.Output(map[int]interface{}{
 							0: str[len(str)-1],
-							1: name,
+							1: name + "cc",
+							2: "test",
 						})
 					})
 				},
@@ -113,4 +124,3 @@ var Avatar = &Spider{
 		},
 	},
 }
-
